@@ -147,13 +147,17 @@ class Simulation:
         self.dt = 1 / 60
         self.road_seg = []
         a = Road_Segment(0, 400, 400, 400, 20, True, "east", "Stop sign")
-        b = Road_Segment(400, 400, 800, 400, 20, False, "east", "No stop sign")
-        c = Road_Segment(400, 405, 0, 405, 20, False, "west", "No stop sign")
-        d = Road_Segment(800, 405, 400, 405, 20, True, "west", "Stop sign")
-        e = Road_Segment(405, 0, 405, 400, 20, True, "north", "Stop sign")
-        f = Road_Segment(405, 400, 405, 800, 20, False, "north", "No stop sign")
-        g = Road_Segment(400, 800, 400, 400, 20, True, "south", "Stop sign")
-        h = Road_Segment(400, 400, 400, 0, 20, False, "south", "No stop sign")
+        b = Road_Segment(400, 400, 405, 400, 20, False, "east", "No stop sign")
+        c = Road_Segment(405, 400, 800, 400, 20, False, "east", "No stop sign")
+        d = Road_Segment(800, 405, 405, 405, 20, True, "west", "Stop sign")
+        e = Road_Segment(405, 405, 400, 405, 20, False, "west", "No stop sign")
+        f = Road_Segment(400, 405, 0, 405, 20, False, "west", "No stop sign")
+        g = Road_Segment(405, 0, 405, 400, 20, True, "north", "Stop sign")
+        h = Road_Segment(405, 400, 405, 405, 20, False, "north", "No stop sign")
+        i = Road_Segment(405, 405, 405, 800, 20, False, "north", "No stop sign")
+        j = Road_Segment(400, 800, 400, 405, 20, True, "south", "Stop sign")
+        k = Road_Segment(400, 405, 400, 400, 20, False, "south", "No stop sign")
+        l = Road_Segment(400, 400, 400, 0, 20, False, "south", "No stop sign")
         self.road_seg.append(a)
         self.road_seg.append(b)
         self.road_seg.append(c)
@@ -162,15 +166,30 @@ class Simulation:
         self.road_seg.append(f)
         self.road_seg.append(g)
         self.road_seg.append(h)
+        self.road_seg.append(i)
+        self.road_seg.append(j)
+        self.road_seg.append(k)
+        self.road_seg.append(l)
         a.roadSeg[0] = b
-        a.roadSeg[2] = d
-        a.roadSeg[3] = c
-        d.roadSeg[0] = c
-        d.roadSeg[3] = b
+        a.roadSeg[1] = l
+        a.roadSeg[3] = f
+        b.roadSeg[0] = c
+        b.roadSeg[2] = h
+        d.roadSeg[0] = e
+        d.roadSeg[1] = i
+        d.roadSeg[3] = c
         e.roadSeg[0] = f
-        e.roadSeg[3] = h
+        e.roadSeg[2] = k
         g.roadSeg[0] = h
-        g.roadSeg[3] = f
+        g.roadSeg[1] = c
+        g.roadSeg[3] = l
+        h.roadSeg[0] = i
+        h.roadSeg[2] = e
+        j.roadSeg[0] = k
+        j.roadSeg[1] = f
+        j.roadSeg[3] = i
+        k.roadSeg[0] = l
+        k.roadSeg[2] = b
 
     def add_vehicle(self, veh):
         self.vehicles[veh.id] = veh
