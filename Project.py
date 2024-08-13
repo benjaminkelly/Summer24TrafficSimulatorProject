@@ -55,7 +55,6 @@ class Vehicle:
                 self.next_vy += self.next_ay * dt
                 self.next_py += (self.current_vy * dt + self.current_ay * dt * dt / 2)
         distancefinal = math.sqrt((road_segment.x2 - self.next_px) ** 2 + (road_segment.y2 - self.next_py) ** 2)
-        print("Distance final: " + str(distancefinal))
         if road_segment.trafficcontrol == "Stop sign" and distancefinal <= 100:
             if distancefinal == 0:
                 self.next_vx = 0
@@ -117,7 +116,6 @@ class Vehicle:
         return v
 
 class VehicleGenerator:
-
     def __init__(self, x, y, orient, rate):
         self.x = x
         self.y = y
@@ -147,17 +145,13 @@ class Simulation:
         self.dt = 1 / 60
         self.road_seg = []
         a = Road_Segment(0, 400, 400, 400, 20, True, "east", "Stop sign")
-        b = Road_Segment(400, 400, 405, 400, 20, False, "east", "No stop sign")
-        c = Road_Segment(405, 400, 800, 400, 20, False, "east", "No stop sign")
-        d = Road_Segment(800, 405, 405, 405, 20, True, "west", "Stop sign")
-        e = Road_Segment(405, 405, 400, 405, 20, False, "west", "No stop sign")
-        f = Road_Segment(400, 405, 0, 405, 20, False, "west", "No stop sign")
-        g = Road_Segment(405, 0, 405, 400, 20, True, "north", "Stop sign")
-        h = Road_Segment(405, 400, 405, 405, 20, False, "north", "No stop sign")
-        i = Road_Segment(405, 405, 405, 800, 20, False, "north", "No stop sign")
-        j = Road_Segment(400, 800, 400, 405, 20, True, "south", "Stop sign")
-        k = Road_Segment(400, 405, 400, 400, 20, False, "south", "No stop sign")
-        l = Road_Segment(400, 400, 400, 0, 20, False, "south", "No stop sign")
+        b = Road_Segment(400, 400, 800, 400, 20, False, "east", "No stop sign")
+        c = Road_Segment(800, 405, 405, 405, 20, False, "west", "Stop sign")
+        d = Road_Segment(405, 405, 0, 405, 20, False, "west", "No stop sign")
+        e = Road_Segment(405, 0, 405, 400, 20, False, "north", "Stop sign")
+        f = Road_Segment(405, 400, 405, 800, 20, False, "north", "No stop sign")
+        g = Road_Segment(400, 800, 400, 405, 20, False, "south", "Stop sign")
+        h = Road_Segment(400, 405, 400, 0, 20, False, "south", "No stop sign")
         self.road_seg.append(a)
         self.road_seg.append(b)
         self.road_seg.append(c)
@@ -166,30 +160,22 @@ class Simulation:
         self.road_seg.append(f)
         self.road_seg.append(g)
         self.road_seg.append(h)
-        self.road_seg.append(i)
-        self.road_seg.append(j)
-        self.road_seg.append(k)
-        self.road_seg.append(l)
         a.roadSeg[0] = b
-        a.roadSeg[1] = l
-        a.roadSeg[3] = f
-        b.roadSeg[0] = c
-        b.roadSeg[2] = h
-        d.roadSeg[0] = e
-        d.roadSeg[1] = i
-        d.roadSeg[3] = c
+        a.roadSeg[1] = h
+        a.roadSeg[2] = f
+        a.roadSeg[3] = d
+        c.roadSeg[0] = d
+        c.roadSeg[1] = f
+        c.roadSeg[2] = h
+        c.roadSeg[3] = b
         e.roadSeg[0] = f
-        e.roadSeg[2] = k
+        e.roadSeg[1] = b
+        e.roadSeg[2] = d
+        e.roadSeg[3] = h
         g.roadSeg[0] = h
-        g.roadSeg[1] = c
-        g.roadSeg[3] = l
-        h.roadSeg[0] = i
-        h.roadSeg[2] = e
-        j.roadSeg[0] = k
-        j.roadSeg[1] = f
-        j.roadSeg[3] = i
-        k.roadSeg[0] = l
-        k.roadSeg[2] = b
+        g.roadSeg[1] = d
+        g.roadSeg[2] = b
+        g.roadSeg[3] = f
 
     def add_vehicle(self, veh):
         self.vehicles[veh.id] = veh
@@ -211,6 +197,8 @@ class Simulation:
                 seg.update_phase1(self.dt)
             for seg in self.road_seg:
                 seg.update_phase2(self.dt)
+            for seg in self.road_seg:
+                seg.update_phase3(self.dt)
             for seg in self.road_seg:
                 for veh in seg.vehicles:
                     veh_dict = veh.to_dict()
@@ -235,7 +223,7 @@ class Road_Segment():
         self.switch = 0
         self.switchRecord = []
         if veh_gen:
-            self.vgen = VehicleGenerator(x1, y1, orient, 60)
+            self.vgen = VehicleGenerator(x1, y1, orient, 40)
         else:
             self.vgen = None
         self.x1 = x1
@@ -260,22 +248,62 @@ class Road_Segment():
             veh.update_phase1(self, 1)
         return
 
-    def update_phase2(self, dt):
+    def update_phase3(self, dt):
         for veh in self.vehicles:
-            veh.update_phase2(1)
             if (self.orient == "east" and veh.current_px > self.x2) or (
                     self.orient == "west" and veh.current_px < self.x2) or (
                     self.orient == "north" and veh.current_py > self.y2) or (
                     self.orient == "south" and veh.current_py < self.y2):
+                rdm = random.random()
+                print("Random: " + str(rdm))
+                distancefinal = math.sqrt((self.x2 - veh.current_px) ** 2 + (self.y2 - veh.current_py) ** 2)
+                if rdm >= 0 and rdm < 0.75:
+                    new_roadSeg = self.roadSeg[0]
+                elif rdm >= 0.75 and rdm < 0.85:
+                    new_roadSeg = self.roadSeg[1]
+                    temp_vx = veh.current_vx
+                    veh.current_vx = veh.current_vy
+                    veh.current_vy = -temp_vx
+                    temp_ax = veh.current_ax
+                    veh.current_ax = veh.current_ay
+                    veh.current_ay = -temp_ax
+                elif rdm >= 0.85 and rdm < 0.95:
+                    new_roadSeg = self.roadSeg[2]
+                    temp_vx = veh.current_vx
+                    veh.current_vx = -veh.current_vy
+                    veh.current_vy = temp_vx
+                    temp_ax = veh.current_ax
+                    veh.current_ax = -veh.current_ay
+                    veh.current_ay = temp_ax
+                else:
+                    new_roadSeg = self.roadSeg[3]
+                    temp_vx = veh.current_vx
+                    veh.current_vx = -veh.current_vy
+                    veh.current_vy = -temp_vx
+                    temp_ax = veh.current_ax
+                    veh.current_ax = -veh.current_ay
+                    veh.current_ay = -temp_ax
+                if new_roadSeg is not None:
+                    veh.current_px = new_roadSeg.x1
+                    veh.current_py = new_roadSeg.y1
+                    if new_roadSeg.orient == "east":
+                        veh.current_px += distancefinal
+                    elif new_roadSeg.orient == "west":
+                        veh.current_px -= distancefinal
+                    elif new_roadSeg.orient == "north":
+                        veh.current_py += distancefinal
+                    else:
+                        veh.current_py -= distancefinal
+                    new_roadSeg.add_vehicle(veh)
+                    print("Added vehicle " + str(veh.id) + " to Road Segment " + str(new_roadSeg.x1) + " " + str(
+                        new_roadSeg.y1))
                 self.remove_vehicle(veh)
                 print("Removed vehicle " + str(veh.id) + " from Road Segment " + str(self.x1) + " " + str(self.y1))
-                if self.roadSeg[0] is not None:
-                    self.roadSeg[0].add_vehicle(veh)
-                    print("Added vehicle " + str(veh.id) + " to Road Segment " + str(self.roadSeg[0].x1) + " " + str(
-                        self.roadSeg[0].y1))
         return
-
-    veh = {"id": "abcd5678", "x": 42, "y": 7}
+    def update_phase2(self, dt):
+        for veh in self.vehicles:
+            veh.update_phase2(1)
+        return
 
     def to_dict(self):
         v = {}
