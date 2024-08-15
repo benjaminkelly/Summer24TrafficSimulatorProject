@@ -28,32 +28,32 @@ class Vehicle:
         # Update position and velocity
         if self.orient == "east":
             if self.current_vx + self.current_ax * dt < 0:
-                self.next_px -= (self.current_vx * dt + self.current_ax * dt * dt / 2)
+                self.next_px = self.current_px - (self.current_vx * dt + self.current_ax * dt * dt / 2)
                 self.next_vx = 0
             else:
-                self.next_vx += self.current_ax * dt
-                self.next_px += (self.current_vx * dt + self.current_ax * dt * dt / 2)
+                self.next_vx = self.current_vx + (self.current_ax * dt)
+                self.next_px = self.current_px + (self.current_vx * dt + self.current_ax * dt * dt / 2)
         else:
             if self.current_vx + self.current_ax * dt > 0:
-                self.next_px -= (self.current_vx * dt + self.current_ax * dt * dt / 2)
+                self.next_px = self.current_px - (self.current_vx * dt + self.current_ax * dt * dt / 2)
                 self.next_vx = 0
             else:
-                self.next_vx += self.current_ax * dt
-                self.next_px += (self.current_vx * dt + self.current_ax * dt * dt / 2)
+                self.next_vx = self.current_vx + (self.current_ax * dt)
+                self.next_px = self.current_px + (self.current_vx * dt + self.current_ax * dt * dt / 2)
         if self.orient == "north":
             if self.current_vy + self.current_ay * dt < 0:
-                self.next_py -= (self.current_vy * dt + self.current_ay * dt * dt / 2)
+                self.next_py = self.current_py - (self.current_vy * dt + self.current_ay * dt * dt / 2)
                 self.next_vy = 0
             else:
-                self.next_vy += self.next_ay * dt
-                self.next_py += (self.current_vy * dt + self.current_ay * dt * dt / 2)
+                self.next_vy = self.current_vy + (self.next_ay * dt)
+                self.next_py = self.current_py + (self.current_vy * dt + self.current_ay * dt * dt / 2)
         else:
             if self.current_vy + self.current_ay * dt > 0:
-                self.next_py -= (self.current_vy * dt + self.current_ay * dt * dt / 2)
+                self.next_py = self.current_py - (self.current_vy * dt + self.current_ay * dt * dt / 2)
                 self.next_vy = 0
             else:
-                self.next_vy += self.next_ay * dt
-                self.next_py += (self.current_vy * dt + self.current_ay * dt * dt / 2)
+                self.next_vy = self.current_vy + (self.next_ay * dt)
+                self.next_py = self.current_py + (self.current_vy * dt + self.current_ay * dt * dt / 2)
         distancefinal = math.sqrt((road_segment.x2 - self.next_px) ** 2 + (road_segment.y2 - self.next_py) ** 2)
         if road_segment.trafficcontrol == "Stop sign" and distancefinal <= 100:
             if distancefinal == 0:
@@ -146,12 +146,12 @@ class Simulation:
         self.road_seg = []
         a = Road_Segment(0, 400, 400, 400, 20, True, "east", "Stop sign")
         b = Road_Segment(400, 400, 800, 400, 20, False, "east", "No stop sign")
-        c = Road_Segment(800, 405, 405, 405, 20, False, "west", "Stop sign")
-        d = Road_Segment(405, 405, 0, 405, 20, False, "west", "No stop sign")
+        c = Road_Segment(800, 405, 400, 405, 20, False, "west", "Stop sign")
+        d = Road_Segment(400, 405, 0, 405, 20, False, "west", "No stop sign")
         e = Road_Segment(405, 0, 405, 400, 20, False, "north", "Stop sign")
         f = Road_Segment(405, 400, 405, 800, 20, False, "north", "No stop sign")
-        g = Road_Segment(400, 800, 400, 405, 20, False, "south", "Stop sign")
-        h = Road_Segment(400, 405, 400, 0, 20, False, "south", "No stop sign")
+        g = Road_Segment(400, 800, 400, 400, 20, False, "south", "Stop sign")
+        h = Road_Segment(400, 400, 400, 0, 20, False, "south", "No stop sign")
         self.road_seg.append(a)
         self.road_seg.append(b)
         self.road_seg.append(c)
@@ -259,6 +259,7 @@ class Road_Segment():
                 distancefinal = math.sqrt((self.x2 - veh.current_px) ** 2 + (self.y2 - veh.current_py) ** 2)
                 if rdm >= 0 and rdm < 0.75:
                     new_roadSeg = self.roadSeg[0]
+                    print("straight thru")
                 elif rdm >= 0.75 and rdm < 0.85:
                     new_roadSeg = self.roadSeg[1]
                     temp_vx = veh.current_vx
@@ -267,6 +268,7 @@ class Road_Segment():
                     temp_ax = veh.current_ax
                     veh.current_ax = veh.current_ay
                     veh.current_ay = -temp_ax
+                    print("making right turn")
                 elif rdm >= 0.85 and rdm < 0.95:
                     new_roadSeg = self.roadSeg[2]
                     temp_vx = veh.current_vx
@@ -275,6 +277,7 @@ class Road_Segment():
                     temp_ax = veh.current_ax
                     veh.current_ax = -veh.current_ay
                     veh.current_ay = temp_ax
+                    print("making left turn")
                 else:
                     new_roadSeg = self.roadSeg[3]
                     temp_vx = veh.current_vx
@@ -283,9 +286,13 @@ class Road_Segment():
                     temp_ax = veh.current_ax
                     veh.current_ax = -veh.current_ay
                     veh.current_ay = -temp_ax
+                    print("U turn")
                 if new_roadSeg is not None:
                     veh.current_px = new_roadSeg.x1
+                    veh.next_px = 444
                     veh.current_py = new_roadSeg.y1
+                    print("Turned vehicle ID: " + str(veh.id) + "     Current x-position: " + str(veh.current_px) +
+                          "      Current y-position: " + str(veh.current_py))
                     if new_roadSeg.orient == "east":
                         veh.current_px += distancefinal
                     elif new_roadSeg.orient == "west":
@@ -295,10 +302,12 @@ class Road_Segment():
                     else:
                         veh.current_py -= distancefinal
                     new_roadSeg.add_vehicle(veh)
+                    veh.orient = new_roadSeg.orient
                     print("Added vehicle " + str(veh.id) + " to Road Segment " + str(new_roadSeg.x1) + " " + str(
                         new_roadSeg.y1))
                 self.remove_vehicle(veh)
-                print("Removed vehicle " + str(veh.id) + " from Road Segment " + str(self.x1) + " " + str(self.y1))
+                print("Removed vehicle " + str(veh.id) + " at x-position: " + str(veh.current_px) + " and at y-position "
+                      + str(veh.current_py)+ " from Road Segment " + str(self.x1) + " " + str(self.y1))
         return
     def update_phase2(self, dt):
         for veh in self.vehicles:
@@ -330,4 +339,4 @@ class Road_Segment():
         return v
 
 sim = Simulation()
-sim.run(150)
+sim.run(250)
