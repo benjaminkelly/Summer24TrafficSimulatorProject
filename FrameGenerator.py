@@ -15,7 +15,7 @@ for i in vehicle_series:
     print(i)
 
 def img_background(road_seg_list, loop_counter):
-    image = Image.new("RGB", (1000, 1000), "black")
+    image = Image.new("RGB", (1500, 1500), "black")
     mydraw = ImageDraw.Draw(image)
     mydraw.text((200, 5), "Traffic Simulator: Frame #" + str(loop_counter), align="center", fill="white", font_size=24)
     for seg in road_seg_list:

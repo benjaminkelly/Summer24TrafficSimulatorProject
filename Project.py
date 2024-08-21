@@ -146,12 +146,14 @@ class Simulation:
         self.road_seg = []
         a = Road_Segment(0, 400, 400, 400, 20, True, "east", "Stop sign")
         b = Road_Segment(400, 400, 800, 400, 20, False, "east", "No stop sign")
-        c = Road_Segment(800, 405, 400, 405, 20, False, "west", "Stop sign")
+        c = Road_Segment(800, 405, 400, 405, 20, True, "west", "Stop sign")
         d = Road_Segment(400, 405, 0, 405, 20, False, "west", "No stop sign")
-        e = Road_Segment(405, 0, 405, 400, 20, False, "north", "Stop sign")
+        e = Road_Segment(405, 0, 405, 400, 20, True, "north", "Stop sign")
         f = Road_Segment(405, 400, 405, 800, 20, False, "north", "No stop sign")
-        g = Road_Segment(400, 800, 400, 400, 20, False, "south", "Stop sign")
+        g = Road_Segment(400, 800, 400, 400, 20, True, "south", "Stop sign")
         h = Road_Segment(400, 400, 400, 0, 20, False, "south", "No stop sign")
+        i = Road_Segment(800, 400, 1200, 400, 20, True, "west", "Stop sign")
+        j = Road_Segment(1200, 405, 800, 405, 20, False, "east", "No stop sign")
         self.road_seg.append(a)
         self.road_seg.append(b)
         self.road_seg.append(c)
@@ -255,6 +257,7 @@ class Road_Segment():
                     self.orient == "north" and veh.current_py > self.y2) or (
                     self.orient == "south" and veh.current_py < self.y2):
                 rdm = random.random()
+                rdm_count = rdm.append()
                 print("Random: " + str(rdm))
                 distancefinal = math.sqrt((self.x2 - veh.current_px) ** 2 + (self.y2 - veh.current_py) ** 2)
                 if rdm >= 0 and rdm < 0.75:
@@ -339,4 +342,4 @@ class Road_Segment():
         return v
 
 sim = Simulation()
-sim.run(250)
+sim.run(500)
